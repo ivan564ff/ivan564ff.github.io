@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+
+<head>
+  <title>BLE 左</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> 
+   <!--import 函式 -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-base.min.js"></script>
+  <style type="text/css">  
+    /* log大小     */
+    html, body, #container { 
+      width: 720; height: 480; margin: 0; padding: 0; 
+    } 
+  </style>
+
+
+  <script>
+    
+    var _serv_uuid = '0000FFF0-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    var _char_uuid = '0000FFF1-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    var _char2_uuid = '0000FFF2-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    var _char3_uuid = '0000FFF3-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    var _char4_uuid = '0000FFF4-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    var i=0,flag=0,s=0,adc1DataAV=0,adc2DataAV=0,adc3DataAV=0,adc4DataAV=0,k=0;
+    const chartUpdateInterval = setInterval(updateChartEverySecond, 500);
+    var bluetoothDevice = null;
+    var connected = false;
+    var StatusValue;
+    var range=0X1FFF;
+    var notified = false;
+    let myCharacteristic;
+    let gattOperationInProgress = false;
+    var change_flag=0,downloadCount=0,step_flag=0;
+    //let step;
+    const dataR1 = [];
+    const dataR2 = [];
+    const dataR3 = [];
+    const dataR4 = [];
+    var log1;
+    
+    // 框框內文字檔:
+    // 定義一個名為log的函式，接受參數v
+    function log(v) {
+    // 將傳入的參數轉換為字串，如果是字串則直接使用，否則使用JSON.stringify轉換為字串
+      var line = Array.prototype.slice.call(arguments).map(function (argument) {
+      return typeof argument === 'string' ? argument : JSON.stringify(argument);
+      }).join(' ');// 轉成字串
+
+      // 取得具有id為'log'的元素
+      var logElement = document.querySelector('#log');
+
+      // 設定文本的字體大小為30像素
+      logElement.style.fontSize = '30px';
+
+      // 在文本內容後添加新的行，顯示日誌訊息
+      logElement.textContent += line + '\n';
+
+      // 同時將日誌訊息輸出到控制台(console)
+      console.log(line);
+    }
+    
+    //藍芽
+    function _connect() {
+      document.querySelector('#log').textContent = '';  // 取得具有id為'log'的HTML元素，並清空其文本內容
+      log('Requesting any Bluetooth Device...');  // 輸出日誌訊息，表示正在請求任何藍牙設備
+      navigator.bluetooth.requestDevice({   // 使用Web Bluetooth API的requestDevice方法發起藍牙設備的請求
+      filters: [{name: 'bebBluetooth'}],  // SimpleBLEPer  bebBluetooth 藍芽名稱
+        //acceptAllDevices : true
+      optionalServices: [_serv_uuid]//設備端 // 指定可接受的服務UUID
+
+      })
+        .then(device => {   //使用Promise連續處理藍牙設備連接的相關操作
+          log('Connecting to GATT Server...');
+          bluetoothDevice = device;// 將藍牙設備存儲到變數bluetoothDevice中
+          bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);// 監聽'gattserverdisconnected'事件，當斷開連接時執行onDisconnected函式
+          return device.gatt.connect();// 使用Promise連接到GATT伺服器
+        })
+        .then(server => {
+          log('Getting Service...');
+          return server.getPrimaryService(_serv_uuid);// 使用Promise獲取主服務，指定服務UUID為_serv_uuid
+        })
+
+        .then(service => {// 在獲取主服務後，進一步處理獲取特徵的相關操作
+          log('Getting Characteristic...');
+          //特徵
+          service.getCharacteristic(_char_uuid)// 使用Promise獲取特定UUID的特徵
+
+          .then(characteristic => {
+          myCharacteristic = characteristic; // 將獲取到的特徵存儲到變數myCharacteristic中
+          myCharacteristic.startNotifications()// 啟動特徵的通知
+          .then(_ => {
+          notified = true;
+          myCharacteristic.addEventListener('characteristicvaluechanged',// 監聽'characteristicvaluechanged'事件，當特徵值改變時執行handleNotifications函式
+          handleNotifications);
+        })
+        })   
+          connected = true; 
+          _update();
+
+        })
+
+    }
+
+    function onDisconnected(event) {  // 定義當藍牙連接斷開時的處理函式 連線不到關掉
+      log("Disconnected by remote device!");
+      bluetoothDevice = null;
+      connected = false;
+      notified = false;
+      _update();
+    }
+
+    function _disconnect() {// 定義斷開藍牙連接的函式 手動關掉
+      log("_disconnect");
+      if (!connected) {
+        return;
+      }
+      log('Disconnecting from Bluetooth Device...');
+      if (bluetoothDevice.gatt.connected) {  // 檢查藍牙設備的GATT是否已連接，如果是，則斷開連接
+        bluetoothDevice.gatt.disconnect();
+      } else {
+        log('> Bluetooth Device is already disconnected');
+      }
+      _update();
+    }
+//
+//內容自行寫
+    function _test() {
+      log('按下test')
+      log(realvalue)
+    }
+
+
+    function _read() {
+      if (!connected)
+        return;
+        flag=flag^1; //1秒1次
+    }
+    function _save()
+    {
+      loadData();
+    }
+    function _judge()
+    {
+     log('測試按鈕內容')
+    }
+
+//
+
+
+//連上藍芽才動作
+    function _update() {  // 定義更新介面狀態的函式
+      if (!navigator.bluetooth) { // 如果瀏覽器不支援Web Bluetooth API
+        document.querySelector('#state').innerText = "Not supported!";  // 在介面上顯示不支援的訊息
+        document.querySelector('#hint').innerText = "Hint: Web Bluetooth API is not available on current browser";
+      // 隱藏安裝按鈕// 禁用連接按鈕和通知按鈕
+        $("#install").hide();
+        document.querySelector('#connect').classList.add("disabled");
+        document.querySelector('#notify').classList.add("disabled");
+        // 設置所有輸入框為只讀// 禁用其他按鈕
+        $('input').attr('readonly', true);
+        document.querySelector('#show').classList.add("disabled");
+        document.querySelector('#read').classList.add("disabled");
+        document.querySelector('#save').classList.add("disabled");
+        document.querySelector('#test').classList.add("disabled");
+        document.querySelector('#judge').classList.add("disabled");
+        document.querySelector('#adc').classList.add("disabled");
+        // 隱藏切換按鈕
+        $("#toggle").hide();
+        // document.querySelector('#toggle').classList.add("disabled");
+        return;
+      }
+
+      if (connected ) {
+        // 設定連接按鈕的點擊事件為斷開連接 修改連接按鈕的文字為"Disconnect" 移除連接按鈕的"btn-primary"樣式
+        document.querySelector('#connect').onclick = _disconnect;
+        document.querySelector('#connect').innerText = "Disconnect";
+        document.querySelector('#connect').classList.remove("btn-primary");
+        // 設定讀取按鈕的點擊事件為_read函式 移除讀取按鈕的"disabled"樣式，添加"btn-primary"樣式
+        document.querySelector('#read').onclick = _read;
+        document.querySelector('#read').classList.remove("disabled");
+        document.querySelector('#read').classList.add("btn-primary");
+        // 設定保存按鈕的點擊事件為_save函式 // 移除保存按鈕的"disabled"樣式，添加"btn-primary"樣式
+        document.querySelector('#save').onclick = _save;
+        document.querySelector('#save').classList.remove("disabled");
+        document.querySelector('#save').classList.add("btn-primary");
+        // 設定測試按鈕的點擊事件為_test函式 移除測試按鈕的"disabled"樣式，添加"btn-primary"樣式
+        document.querySelector('#test').onclick = _test;
+        document.querySelector('#test').classList.remove("disabled");
+        document.querySelector('#test').classList.add("btn-primary");  
+        // 設定判斷按鈕的點擊事件為_judge函式 移除判斷按鈕的"disabled"樣式，添加"btn-primary"樣式
+        document.querySelector('#judge').onclick = _judge;
+        document.querySelector('#judge').classList.remove("disabled");
+        document.querySelector('#judge').classList.add("btn-primary");
+        // 設定狀態顯示為"Connected" 設定提示信息為"1"
+        document.querySelector('#state').innerText = "Connected";
+        document.querySelector('#hint').innerText = "1";
+
+      }
+      else {
+        // 隱藏安裝按鈕
+        $("#install").hide();
+        // 設定連接按鈕的點擊事件為_connect函式
+        document.querySelector('#connect').onclick = _connect;
+        document.querySelector('#connect').innerText = "Connect";
+        document.querySelector('#connect').classList.add("btn-primary");
+        document.querySelector('#state').innerText = "Disconnected";
+        document.querySelector('#hint').innerText = "0";
+        $("#toggle").hide();
+      }
+    }
+
+    let readValueInProgress = false;
+    function handleNotifications(event) {
+      if (!connected || readValueInProgress) {  // 如果未連接到藍牙設備或正在進行讀取操作，則直接返回，不動作
+        return;
+    }
+        readValueInProgress = true;
+        // 使用Web Bluetooth API的readValue()方法從藍牙特徵中讀取值
+        myCharacteristic .readValue()
+        .then(value => {
+          value = value.buffer ? value : new DataView(value);  //condition ? expr1 : expr2 condition 為真，則返回 expr1，否則返回 expr2
+          // 壓力值矩陣轉換十進制 問題?????
+          realvalue=value.getUint16(0)+value.getUint8(2)*65536;  //32拆成2*16[1 0]又拆成8[3 2 1 0]
+          realvalue2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536; //8[7 6 5 4] 順序變 2^24 2^16 2^8 2^0
+          realvalue3=value.getUint16(4) +value.getUint8(10)*65536; //8[11 10 9 8] 
+          realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
+          log1=value.getUint8(2);
+          readValueInProgress = false;
+          log(log1);
+        })
+
+        if(flag)
+        {
+        chart.data.labels.push('');
+        chart.data.datasets[0].data.push(realvalue);//值到圖表
+        chart.data.datasets[1].data.push(realvalue2);
+        chart.data.datasets[2].data.push(realvalue3);
+        chart.data.datasets[3].data.push(realvalue4);
+        ring
+        dataR1[s]=realvalue;
+        dataR2[s]=realvalue2;
+        dataR3[s]=realvalue3;
+        dataR4[s]=realvalue4;
+        s++;
+        s = s & range;
+        // 存值次數
+
+
+       //圖表最大寬度
+       // var maxLength = 512;//computer
+        var maxLength = 256; //phone
+            if (chart.data.labels.length > maxLength) { //realtime即時可視
+                chart.data.labels.shift();
+                for (var i = 0; i < chart.data.datasets.length; i++) { // 對每個數據集（datasets）中的數據點進行相同的處理
+                    chart.data.datasets[i].data.shift(); // 刪除過期的數據點
+                }
+            }
+          
+
+        }
+
+      
+      
+
+    }
+
+    function updateChartEverySecond() {
+    // 在这里调用 chart.update()
+    if(flag)
+    {
+    chart.update();
+    }
+    
+}
+// 值傳入檔案內
+    function loadData() {
+      downloadCount++;
+   const data = {
+            array1: dataR1,
+            array2: dataR2,
+            array3: dataR3,
+            array4: dataR4,
+        };
+
+   var jsonData = JSON.stringify(data);
+  // 存成JSON檔
+    // 创建一个Blob对象
+    var blob = new Blob([jsonData], { type: 'application/json' });
+
+    // 创建一个下载链接
+    var downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
+
+    // 模拟点击下载链接
+    downloadLink.click();
+
+
+}
+  </script>
+
+</head>
+<center>
+<!-- Chart設置 -->
+  <body onload='_update()'> 
+  <div class="container">
+    <div class="page-header">
+      <canvas id="chart" width="720" height="360"></canvas>
+      <script>
+        // 创建一个Chart实例
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // X轴标签，可根据需要进行设置
+                datasets: [
+                    {
+                        label: 'ADC 1', // 数据集名称
+                        borderColor: 'red',
+                        backgroundColor: 'transparent',//背景透明
+                        data: [] // 数据集中的数据
+                    },
+                    {
+                        label: 'ADC 2',
+                        borderColor: 'blue',
+                        backgroundColor: 'transparent',
+                        data: []
+                    },
+                    {
+                        label: 'ADC 3',
+                        borderColor: 'green',
+                        backgroundColor: 'transparent',
+                        data: []
+                    },
+                    {
+                        label: 'ADC 4',
+                        borderColor: 'orange',
+                        backgroundColor: 'transparent',
+                        data: []
+                    }
+                ]
+            },
+            options: {
+              
+                responsive: true,
+                animation: {
+                  duration: 0 // 将动画持续时间设置为0，禁用动画效果
+                 },
+                scales: {
+                  x: {
+                        ticks: {
+                            stepSize: 2 // 设置刻度的间隔大小
+                        }
+                    },
+                    y: {
+                        //beginAtZero: true,
+                        suggestedMin: 4000000, // 设置Y轴的最小值
+                        suggestedMax: 7000000  // 设置Y轴的最大值*/
+                    }
+                
+                }
+            }
+        });
+    </script>
+    <!-- 按鈕設置 -->
+    </div>
+    <div class="row">
+      <div class="col-sm-3">
+        <button id='connect' type="button" class="btn btn-lg btn-block">Connect</button>
+        <br>
+        <button id='read' type="button" class="btn btn-lg btn-block">Read</button>
+        <br>
+        <button id='save' type="button" class="btn btn-lg btn-block">save</button>
+        <br>
+        <button id='judge' type="button" class="btn btn-lg btn-block">judge</button>
+        <br>
+        <button id='test' type="button" class="btn btn-lg btn-block">test</button>
+        <br>
+        <button id='toggle' type="button" class="btn btn-lg btn-block">Value</button>
+        <br>
+        <button id='install' type="button" class="btn btn-lg btn-outline-light btn-block">Install</button>
+      </div>
+
+      <div class="col-sm-9">
+        <h4 id='state'></h4>
+        <div id='hint'></div>
+        <h4>Log:</h4>
+        <pre id='log'></pre>
+        <!-- 保留文本格式 -->
+      </div>
+      
+
+
+    </div>
+ </div>
+</body>
+
+</html>
