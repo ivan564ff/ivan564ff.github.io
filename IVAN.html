@@ -87,7 +87,7 @@
       .then(characteristic1 => {
         //log('Got characteristic of Device1');
         myCharacteristic = characteristic1;
-        return navigator.bluetooth.requestDevice({ filters: [{ name: 'SimpleBLEPer' }],
+        return navigator.bluetooth.requestDevice({ filters: [{ name: 'bebBluetooth' }],
         optionalServices: [_serv_uuid]  
      });
       })
