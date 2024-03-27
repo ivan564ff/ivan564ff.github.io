@@ -62,7 +62,7 @@
     function _connect() {
       document.querySelector('#log').textContent = '';
       //log('Requesting any Bluetooth Device...');
-      navigator.bluetooth.requestDevice({ filters: [{ name: '2aebBluetooth' }],
+      navigator.bluetooth.requestDevice({ filters: [{ name: 'cebBluetooth' }],
       optionalServices: [_serv_uuid]
     
     })
@@ -86,7 +86,7 @@
       .then(characteristic1 => {
         //log('Got characteristic of Device1');
         myCharacteristic = characteristic1;
-        return navigator.bluetooth.requestDevice({ filters: [{ name: '2bebBluetooth' }],
+        return navigator.bluetooth.requestDevice({ filters: [{ name: 'debBluetooth' }],
         optionalServices: [_serv_uuid]  
      });
       })
