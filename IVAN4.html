@@ -1,17 +1,18 @@
+<html lang="zh-tw">
 
-<!-- saved from url=(0037)https://ivan564ff.github.io/IVAN.html -->
-<html lang="zh-tw"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>IVAN</title>
-  
+
+<head>
+  <title>IVAN4</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
-  <link rel="manifest" hresf="manifest.json">
-  <link rel="icon" href="https://ivan564ff.github.io/icon.png">
-  <link rel="stylesheet" href="./IVAN_files/bootstrap.min.css">
-  <!-- 引入 jQuery Chart.js Bootstrap Bundle AnyChart -->
-  <script src="./IVAN_files/jquery.min.js.下載"></script>
-  <script src="./IVAN_files/chart.js.下載"></script>
-  <script src="./IVAN_files/bootstrap.bundle.min.js.下載"></script>
-  <script src="./IVAN_files/anychart-base.min.js.下載"></script>
+  <link rel="manifest" hreSf="manifest.json">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-base.min.js"></script>
+</script>
 
 
   <style type="text/css">      
@@ -47,24 +48,21 @@
     const dataR2 = [];
     const dataR3 = [];
     const dataR4 = [];
-    // 框框內文字檔:
-    // 定義一個名為log的函式，接受參數v
+
     function log(v) {
-      // 將傳入的參數轉換為字串，如果是字串則直接使用，否則使用JSON.stringify轉換為字串
       var line = Array.prototype.slice.call(arguments).map(function (argument) {
         return typeof argument === 'string' ? argument : JSON.stringify(argument);
       }).join(' ');
-      // 尋找 id 為 "log" 的元素，並將變數 line 的內容附加到該元素的文字內容後面，加上換行符
+
       document.querySelector('#log').textContent += line + '\n';
-      // 在控制台(console)中輸出變數 line 的內容
       console.log(line);
     }
     
-    //藍芽
+
     function _connect() {
       document.querySelector('#log').textContent = '';
       //log('Requesting any Bluetooth Device...');
-      navigator.bluetooth.requestDevice({ filters: [{ name: 'gebBluetooth' }],//左腳
+      navigator.bluetooth.requestDevice({ filters: [{ name: 'cebBluetooth' }],
       optionalServices: [_serv_uuid]
     
     })
@@ -88,7 +86,7 @@
       .then(characteristic1 => {
         //log('Got characteristic of Device1');
         myCharacteristic = characteristic1;
-        return navigator.bluetooth.requestDevice({ filters: [{ name: 'hebBluetooth' }],//右腳
+        return navigator.bluetooth.requestDevice({ filters: [{ name: 'debBluetooth' }],
         optionalServices: [_serv_uuid]  
      });
       })
@@ -349,14 +347,14 @@ downloadLink.click();
   </script>
 
 </head>
-<body onload="_update()"><center>
- 
+<center>
+<body onload='_update()'> 
   <div class="container">
     <div class="row">  
     <div class="page-header">
       </div>
       <div class="col-sm-6">
-      <canvas id="chart" width="693" height="462" style="display: block; box-sizing: border-box; height: 370px; width: 555px;"></canvas>
+      <canvas id="chart" width="720" height="480"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx = document.getElementById('chart').getContext('2d');
@@ -414,7 +412,7 @@ downloadLink.click();
     </script>
     </div>
     <div class="col-sm-6">
-    <canvas id="chart2" width="693" height="462" style="display: block; box-sizing: border-box; height: 370px; width: 555px;"></canvas>
+    <canvas id="chart2" width="720" height="480"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx2 = document.getElementById('chart2').getContext('2d');
@@ -474,22 +472,22 @@ downloadLink.click();
     
     <div class="row">
       <div class="col-sm-3">
-        <button id="connect" type="button" class="btn btn-lg btn-block btn-primary">Connect</button>
+        <button id='connect' type="button" class="btn btn-lg btn-block">Connect</button>
         <br>
-        <button id="read" type="button" class="btn btn-lg btn-block">Read</button>
+        <button id='read' type="button" class="btn btn-lg btn-block">Read</button>
         <br>
-        <button id="save" type="button" class="btn btn-lg btn-block">save</button>
+        <button id='save' type="button" class="btn btn-lg btn-block">save</button>
         <br>
-        <button id="toggle" type="button" class="btn btn-lg btn-block" style="display: none;">Value</button>
+        <button id='toggle' type="button" class="btn btn-lg btn-block">Value</button>
         <br>
-        <button id="install" type="button" class="btn btn-lg btn-outline-light btn-block" style="display: none;">Install</button>
+        <button id='install' type="button" class="btn btn-lg btn-outline-light btn-block">Install</button>
       </div>
 
       <div class="col-sm-9">
-        <h4 id="state">Disconnected</h4>
-        <div id="hint">0</div>
+        <h4 id='state'></h4>
+        <div id='hint'></div>
         <h4>Log:</h4>
-        <pre id="log"></pre>
+        <pre id='log'></pre>
       </div>
       
 
@@ -499,7 +497,6 @@ downloadLink.click();
  
 
 
+</body>
 
-
-
-</div></center></body></html>
+</html>
