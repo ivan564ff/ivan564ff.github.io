@@ -25,11 +25,11 @@
     
     var _serv_uuid = '0000FFF0-0000-1000-8000-00805F9B34FB'.toLowerCase();
     var _char_uuid = '0000FFF1-0000-1000-8000-00805F9B34FB'.toLowerCase();
-    var _char2_uuid = '0000FFF2-0000-1000-8000-00805F9B34FB'.toLowerCase();
-    var _char3_uuid = '0000FFF3-0000-1000-8000-00805F9B34FB'.toLowerCase();
-    var _char4_uuid = '0000FFF4-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    //var _char2_uuid = '0000FFF2-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    //var _char3_uuid = '0000FFF3-0000-1000-8000-00805F9B34FB'.toLowerCase();
+    //var _char4_uuid = '0000FFF4-0000-1000-8000-00805F9B34FB'.toLowerCase();
     var i=0,flag=0,s=0,adc1DataAV=0,adc2DataAV=0,adc3DataAV=0,adc4DataAV=0,k=0;
-    const chartUpdateInterval = setInterval(updateChartEverySecond, 500);
+    const chartUpdateInterval = setInterval(updateChartEverySecond, 20);
     var bluetoothDevice = null;
     var connected = false;
     var StatusValue;
@@ -43,7 +43,6 @@
     const dataR2 = [];
     const dataR3 = [];
     const dataR4 = [];
-    var log1;
     
     // 框框內文字檔:
     // 定義一個名為log的函式，接受參數v
@@ -71,7 +70,7 @@
       document.querySelector('#log').textContent = '';  // 取得具有id為'log'的HTML元素，並清空其文本內容
       log('Requesting any Bluetooth Device...');  // 輸出日誌訊息，表示正在請求任何藍牙設備
       navigator.bluetooth.requestDevice({   // 使用Web Bluetooth API的requestDevice方法發起藍牙設備的請求
-      filters: [{name: 'bebBluetooth'}],  // SimpleBLEPer  bebBluetooth 藍芽名稱
+      filters: [{name: 'eebBluetooth'}],  // SimpleBLEPer  bebBluetooth 藍芽名稱
         //acceptAllDevices : true
       optionalServices: [_serv_uuid]//設備端 // 指定可接受的服務UUID
 
@@ -148,7 +147,7 @@
     }
     function _judge()
     {
-     log('測試按鈕內容')
+     log(value.getUint8(4))
     }
 
 //
@@ -212,59 +211,62 @@
         document.querySelector('#connect').classList.add("btn-primary");
         document.querySelector('#state').innerText = "Disconnected";
         document.querySelector('#hint').innerText = "0";
+        
         $("#toggle").hide();
       }
     }
 
     let readValueInProgress = false;
-    function handleNotifications(event) {
-      if (!connected || readValueInProgress) {  // 如果未連接到藍牙設備或正在進行讀取操作，則直接返回，不動作
-        return;
-    }
-        readValueInProgress = true;
-        // 使用Web Bluetooth API的readValue()方法從藍牙特徵中讀取值
-        myCharacteristic .readValue()
-        .then(value => {
-          value = value.buffer ? value : new DataView(value);  //condition ? expr1 : expr2 condition 為真，則返回 expr1，否則返回 expr2
-          // 壓力值矩陣轉換十進制 問題?????
-          realvalue=value.getUint16(0)+value.getUint8(2)*65536;  //32拆成2*16[1 0]又拆成8[3 2 1 0]
-          realvalue2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536; //8[7 6 5 4] 順序變 2^24 2^16 2^8 2^0
-          realvalue3=value.getUint16(4) +value.getUint8(10)*65536; //8[11 10 9 8] 
-          realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
-          log1=value.getUint8(2);
-          readValueInProgress = false;
-          log(log1);
-        })
 
-        if(flag)
-        {
+    let notificationCount = 0;
+    let startTime = Date.now();
+
+    function handleNotifications(event) {
+      if (!connected || readValueInProgress) {
+        return;
+      }
+      readValueInProgress = true;
+      myCharacteristic.readValue().then(value => {
+        value = value.buffer ? value : new DataView(value);
+        realvalue = value.getUint16(0) + value.getUint8(2) * 65536;
+        realvalue2 = value.getUint8(4) + value.getUint8(5) * 256 + value.getUint8(6) * 65536;
+        realvalue3 = value.getUint16(4) + value.getUint8(10) * 65536;
+        realvalue4 = value.getUint8(12) + value.getUint8(13) * 256 + value.getUint8(14) * 65536;
+        readValueInProgress = false;
+        
+        notificationCount++;
+        let currentTime = Date.now();
+        if (currentTime - startTime >= 1000) { // 每秒输出一次频率
+            log(`Notifications per second: ${notificationCount}`);
+            notificationCount = 0;
+            startTime = currentTime;
+        }
+      });
+
+      if (flag) {
         chart.data.labels.push('');
-        chart.data.datasets[0].data.push(realvalue);//值到圖表
+        chart.data.datasets[0].data.push(realvalue);
         chart.data.datasets[1].data.push(realvalue2);
         chart.data.datasets[2].data.push(realvalue3);
         chart.data.datasets[3].data.push(realvalue4);
-        ring
-        dataR1[s]=realvalue;
-        dataR2[s]=realvalue2;
-        dataR3[s]=realvalue3;
-        dataR4[s]=realvalue4;
+
+        dataR1[s] = realvalue;
+        dataR2[s] = realvalue2;
+        dataR3[s] = realvalue3;
+        dataR4[s] = realvalue4;
         s++;
         s = s & range;
-        // 存值次數
 
-
-       //圖表最大寬度
-       // var maxLength = 512;//computer
         var maxLength = 256; //phone
-            if (chart.data.labels.length > maxLength) { //realtime即時可視
-                chart.data.labels.shift();
-                for (var i = 0; i < chart.data.datasets.length; i++) { // 對每個數據集（datasets）中的數據點進行相同的處理
-                    chart.data.datasets[i].data.shift(); // 刪除過期的數據點
-                }
+        if (chart.data.labels.length > maxLength) {
+            chart.data.labels.shift();
+            for (var i = 0; i < chart.data.datasets.length; i++) {
+                chart.data.datasets[i].data.shift();
             }
-          
-
         }
+    }
+
+
 
       
       
@@ -361,8 +363,8 @@
                     },
                     y: {
                         //beginAtZero: true,
-                        suggestedMin: 4000000, // 设置Y轴的最小值
-                        suggestedMax: 7000000  // 设置Y轴的最大值*/
+                        suggestedMin: 0, // 设置Y轴的最小值
+                        suggestedMax: 1000000  // 设置Y轴的最大值*/
                     }
                 
                 }
@@ -375,7 +377,7 @@
       <div class="col-sm-3">
         <button id='connect' type="button" class="btn btn-lg btn-block">Connect</button>
         <br>
-        <button id='read' type="button" class="btn btn-lg btn-block">Read</button>
+        <button id='read' type="button" class="btn btn-lg btn-block">read</button>
         <br>
         <button id='save' type="button" class="btn btn-lg btn-block">save</button>
         <br>
