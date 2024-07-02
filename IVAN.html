@@ -215,7 +215,11 @@
         $("#toggle").hide();
       }
     }
-
+    
+    let readValueInProgress = false;
+    let notificationCount = 0;
+    let startTime = Date.now();
+    
     function handleNotifications(event) {
         if (!connected )
         return;
