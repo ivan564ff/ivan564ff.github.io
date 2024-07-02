@@ -227,6 +227,15 @@
           realvalue2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           realvalue3=value.getUint16(4) +value.getUint8(10)*65536;
           realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
+          
+          readValueInProgress = false;
+          notificationCount++;
+          let currentTime = Date.now();
+          if (currentTime - startTime >= 1000) { // 每秒输出一次频率
+            log(`${notificationCount}`);
+            notificationCount = 0;
+            startTime = currentTime;
+          }
         })
         
         //畫圖
@@ -270,6 +279,7 @@
           valueS3=value.getUint16(4) +value.getUint8(10)*65536;
           valueS4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
 
+          
 
         })
 
