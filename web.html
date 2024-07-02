@@ -70,7 +70,7 @@
       document.querySelector('#log').textContent = '';  // 取得具有id為'log'的HTML元素，並清空其文本內容
       log('Requesting any Bluetooth Device...');  // 輸出日誌訊息，表示正在請求任何藍牙設備
       navigator.bluetooth.requestDevice({   // 使用Web Bluetooth API的requestDevice方法發起藍牙設備的請求
-      filters: [{name: 'aebBluetooth'}],  // SimpleBLEPer  bebBluetooth 藍芽名稱
+      filters: [{name: 'febBluetooth'}],  // SimpleBLEPer  bebBluetooth 藍芽名稱
         //acceptAllDevices : true
       optionalServices: [_serv_uuid]//設備端 // 指定可接受的服務UUID
 
