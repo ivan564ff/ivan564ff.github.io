@@ -211,10 +211,15 @@
       }
     }
 
-    function handleNotifications(event) {
-        if (!connected )
-        return;
+    let readValueInProgress1 = false;
 
+    let notificationCount1 = 0;
+    let startTime1 = Date.now();
+
+    function handleNotifications(event) {
+      if (!connected || readValueInProgress1) {
+        return;
+      }
         myCharacteristic .readValue()
         .then(value => {
           value = value.buffer ? value : new DataView(value); //value  
@@ -222,7 +227,15 @@
           realvalue2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           realvalue3=value.getUint16(4) +value.getUint8(10)*65536;
           realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
-        })
+
+          notificationCount1++;
+          let currentTime1 = Date.now();
+          if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
+            log(`${notificationCount1}`);
+            notificationCount1 = 0;
+            startTime1 = currentTime1;
+        }
+        });
         
         //畫圖
         if(flag)
@@ -239,6 +252,9 @@
           dataR4[s]=realvalue4;
           s++;
           s = s & range;
+          
+          /*if(realvalue<=4000000 || realvalue2<=4000000 || realvalue3<=4000000 || realvalue4<=4000000)
+            log('Strain Gauge is broken!');*/
 
           if (chart2.data.labels.length > maxLength) {
                 chart2.data.labels.shift();
@@ -252,11 +268,15 @@
       
 
     }
-    function handleNotifications2(event) {
-      if (!connected )  //  !connected|| readValueInProgress2
+    let readValueInProgress2 = false;
+
+    let notificationCount2 = 0;
+    let startTime2 = Date.now();
+
+    function handleNotifications(event) {
+      if (!connected || readValueInProgress2) {
         return;
-
-
+      }
         myCharacteristic2 .readValue()
         .then(value => {
           value = value.buffer ? value : new DataView(value); //value  
@@ -264,9 +284,14 @@
           valueS2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           valueS3=value.getUint16(4) +value.getUint8(10)*65536;
           valueS4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
-
-
-        })
+          notificationCount2++;
+          let currentTime2 = Date.now();
+          if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
+            log(`${notificationCount2}`);
+            notificationCount2 = 0;
+            startTime2 = currentTime2;
+          }
+        });
 
         if(flagL)
         {
