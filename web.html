@@ -282,30 +282,35 @@
     
 }
 // 值傳入檔案內
-    function loadData() {
-      downloadCount++;
-   const data = {
-            array1: dataR1,
-            array2: dataR2,
-            array3: dataR3,
-            array4: dataR4,
-        };
+function loadData() {
+  downloadCount++;
+  const data = {
+    array1: dataR1.filter(item => item !== null),
+    array2: dataR2.filter(item => item !== null),
+    array3: dataR3.filter(item => item !== null),
+    array4: dataR4.filter(item => item !== null),
+  };
 
-   var jsonData = JSON.stringify(data);
+  var jsonData = JSON.stringify(data);
   // 存成JSON檔
-    // 创建一个Blob对象
-    var blob = new Blob([jsonData], { type: 'application/json' });
+  // 创建一个Blob对象
+  var blob = new Blob([jsonData], { type: 'application/json' });
 
-    // 创建一个下载链接
-    var downloadLink = document.createElement('a');
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
+  // 创建一个下载链接
+  var downloadLink = document.createElement('a');
+  downloadLink.href = URL.createObjectURL(blob);
+  downloadLink.download = 'data' + downloadCount + '.json'; // 下载的文件名
 
-    // 模拟点击下载链接
-    downloadLink.click();
-
-
+  // 模拟点击下载链接
+  downloadLink.click();
+  
+  // 清空数组
+  dataR1.length = 0;
+  dataR2.length = 0;
+  dataR3.length = 0;    
+  dataR4.length = 0;
 }
+
   </script>
 
 </head>
