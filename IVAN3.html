@@ -238,7 +238,8 @@
           
           notificationCount1++;
           let currentTime1 = Date.now();
-          if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
+          let elapsedTime1 = currentTime1 - startTime1;
+          if ( elapsedTime1 >= 1000) { // 每秒输出一次频率
             log(`L:${notificationCount1}`);
             notificationCount1 = 0;
             startTime1 = currentTime1;
@@ -297,7 +298,8 @@
           
           notificationCount2++;
           let currentTime2 = Date.now();
-          if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
+           let elapsedTime2 = currentTime2 - startTime2;
+          if ( elapsedTime2 >= 1000) { // 每秒输出一次频率
             log(`R:${notificationCount2}`);
             notificationCount2 = 0;
             startTime2 = currentTime2;
