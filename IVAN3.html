@@ -34,7 +34,7 @@
     var notified = false;
     var myCharacteristic;
     var change_flag=0,downloadCount=0;
-    var maxLength =256;
+    var maxLength =150;
     const dataL1 = [];
     const dataL2 = [];
     const dataL3 = [];
@@ -382,7 +382,7 @@ function loadData() {
     <div class="page-header">
       </div>
       <div class="col-sm-6">
-      <canvas id="chart" width="720" height="480"></canvas>
+      <canvas id="chart" width="500" height="300"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx = document.getElementById('chart').getContext('2d');
@@ -440,7 +440,7 @@ function loadData() {
     </script>
     </div>
     <div class="col-sm-6">
-    <canvas id="chart2" width="720" height="480"></canvas>
+    <canvas id="chart2" width="500" height="300"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx2 = document.getElementById('chart2').getContext('2d');
