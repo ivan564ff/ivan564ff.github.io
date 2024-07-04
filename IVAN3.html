@@ -162,11 +162,9 @@
 
         flag=flag^1;
         flagL=flagL^1;
-      
-        let notificationCount1 = 0;
-        let startTime1 = Date.now();
-        let notificationCount2 = 0;
-          let startTime2 = Date.now();
+
+
+        
     }
 
 
@@ -218,7 +216,8 @@
     }
 
      let readValueInProgress1 = false;
-
+    let notificationCount1 = 0;
+    let startTime1 = Date.now();
     function handleNotifications(event) {
       if (!connected || readValueInProgress1) {
         return;
@@ -278,7 +277,8 @@
 
     }
     let readValueInProgress2 = false;
-
+    let notificationCount2 = 0;
+   let startTime2 = Date.now();
     function handleNotifications2(event) {
       if (!connected || readValueInProgress2) {
         return;
