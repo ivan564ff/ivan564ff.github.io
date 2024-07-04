@@ -162,11 +162,11 @@
 
         flag=flag^1;
         flagL=flagL^1;
-
-        let readValueInProgress1 = false;
-
+      
         let notificationCount1 = 0;
         let startTime1 = Date.now();
+        let notificationCount2 = 0;
+          let startTime2 = Date.now();
     }
 
 
@@ -217,7 +217,7 @@
       }
     }
 
-    
+     let readValueInProgress1 = false;
 
     function handleNotifications(event) {
       if (!connected || readValueInProgress1) {
@@ -277,7 +277,7 @@
       
 
     }
-    
+    let readValueInProgress2 = false;
 
     function handleNotifications2(event) {
       if (!connected || readValueInProgress2) {
@@ -290,10 +290,9 @@
           valueS2 = value.getUint8(4) + (value.getUint8(5) << 8) + (value.getUint8(6) << 16);
           valueS3 = value.getUint16(4) + (value.getUint8(10) << 16);
           valueS4 = value.getUint8(12) + (value.getUint8(13) << 8) + (value.getUint8(14) << 16);
-          let readValueInProgress2 = false;
+          
 
-          let notificationCount2 = 0;
-          let startTime2 = Date.now();
+          
           notificationCount2++;
           let currentTime2 = Date.now();
           if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
