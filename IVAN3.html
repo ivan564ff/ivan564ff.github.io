@@ -229,10 +229,11 @@
           realvalue3=value.getUint16(4) +value.getUint8(10)*65536;
           realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;*/
           
-          realvalue=value.getUint16(0)+value.getUint8(2)<<16;
-          realvalue2=value.getUint8(4)+value.getUint8(5)<<8 +value.getUint8(6)<<16;
-          realvalue3=value.getUint16(4) +value.getUint8(10)<<16;
-          realvalue4= value.getUint8(12)+value.getUint8(13)<<8 +value.getUint8(14)<<16;
+          realvalue = value.getUint16(0) + (value.getUint8(2) << 16);
+          realvalue2 = value.getUint8(4) + (value.getUint8(5) << 8) + (value.getUint8(6) << 16);
+          realvalue3 = value.getUint16(4) + (value.getUint8(10) << 16);
+          realvalue4 = value.getUint8(12) + (value.getUint8(13) << 8) + (value.getUint8(14) << 16);
+
           
           notificationCount1++;
           let currentTime1 = Date.now();
@@ -286,10 +287,11 @@
         myCharacteristic2 .readValue()
         .then(value => {
           value = value.buffer ? value : new DataView(value); //value  
-          valueS1=value.getUint16(0)+value.getUint8(2)<<16;
-          valueS2=value.getUint8(4)+value.getUint8(5)<<8 +value.getUint8(6)<<16;
-          valueS3=value.getUint16(4) +value.getUint8(10)<<16;
-          valueS4= value.getUint8(12)+value.getUint8(13)<<8 +value.getUint8(14)<<16;
+          valueS1 = value.getUint16(0) + (value.getUint8(2) << 16);
+          valueS2 = value.getUint8(4) + (value.getUint8(5) << 8) + (value.getUint8(6) << 16);
+          valueS3 = value.getUint16(4) + (value.getUint8(10) << 16);
+          valueS4 = value.getUint8(12) + (value.getUint8(13) << 8) + (value.getUint8(14) << 16);
+
           notificationCount2++;
           let currentTime2 = Date.now();
           if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
