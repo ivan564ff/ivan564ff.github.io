@@ -228,10 +228,11 @@
       readValueInProgress = true;
       myCharacteristic.readValue().then(value => {
         value = value.buffer ? value : new DataView(value);
-        realvalue = value.getUint16(0) + value.getUint8(2) * 65536;
-        realvalue2 = value.getUint8(4) + value.getUint8(5) * 256 + value.getUint8(6) * 65536;
-        realvalue3 = value.getUint16(4) + value.getUint8(10) * 65536;
-        realvalue4 = value.getUint8(12) + value.getUint8(13) * 256 + value.getUint8(14) * 65536;
+        realvalue = value.getUint16(0) + (value.getUint8(2) << 16);
+        realvalue2 = value.getUint8(4) + (value.getUint8(5) << 8) + (value.getUint8(6) << 16);
+        realvalue3 = value.getUint16(4) + (value.getUint8(10) << 16);
+        realvalue4 = value.getUint8(12) + (value.getUint8(13) << 8) + (value.getUint8(14) << 16);
+
         readValueInProgress = false;
         
         notificationCount++;
