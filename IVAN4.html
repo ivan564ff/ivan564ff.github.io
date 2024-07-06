@@ -249,7 +249,7 @@
           chart2.data.datasets[1].data.push(realvalue2);
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
-          if(startTime1>8000){
+           if(notificationCount1>=20 && notificationCount2>=20){
             dataR1[s]=realvalue;
             dataR2[s]=realvalue2;
             dataR3[s]=realvalue3;
@@ -303,7 +303,7 @@
           chart.data.datasets[1].data.push(valueS2);
           chart.data.datasets[2].data.push(valueS3);
           chart.data.datasets[3].data.push(valueS4);
-          if(startTime2>8000){
+           if(notificationCount1>=20 && notificationCount2>=20){
             dataL1[sL]=valueS1;
             dataL2[sL]=valueS2;
             dataL3[sL]=valueS3;
