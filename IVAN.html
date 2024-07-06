@@ -1,7 +1,7 @@
 <html lang="zh-tw">
 
 <head>
-  <title>IVAN</title>
+  <title>AB</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
   <link rel="manifest" hreSf="manifest.json">
@@ -214,11 +214,10 @@
         $("#toggle").hide();
       }
     }
-    
-    let readValueInProgress = false;
-    let notificationCount = 0;
-    let startTime = Date.now();
-    
+    //let readValueInProgress1 = false;
+    let notificationCount1 = 0;
+    let startTime1 = Date.now();
+    let saveflag1=0;
     function handleNotifications(event) {
         if (!connected )
         return;
@@ -231,13 +230,14 @@
           realvalue3=value.getUint16(4) +value.getUint8(10)*65536;
           realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
           
-          readValueInProgress = false;
-          notificationCount++;
-          let currentTime = Date.now();
-          if (currentTime - startTime >= 1000) { // 每秒输出一次频率
-            log(`${notificationCount}`);
-            notificationCount = 0;
-            startTime = currentTime;
+          notificationCount1++;
+          let currentTime1 = Date.now();
+          if(notificationCount1>=20)
+            saveflag1=1;
+          if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
+            log(`R:${notificationCount1}`);
+            notificationCount1 = 0;
+            startTime1 = currentTime1;
           }
         })
         
@@ -249,11 +249,12 @@
           chart2.data.datasets[1].data.push(realvalue2);
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
-
-          dataR1[s]=realvalue;
-          dataR2[s]=realvalue2;
-          dataR3[s]=realvalue3;
-          dataR4[s]=realvalue4;
+          if(saveflag1>0 && saveflag2>0){
+            dataR1[s]=realvalue;
+            dataR2[s]=realvalue2;
+            dataR3[s]=realvalue3;
+            dataR4[s]=realvalue4;
+          }
           s++;
           s = s & range;
 
@@ -269,11 +270,15 @@
       
 
     }
+
+    //let readValueInProgress2 = false;
+    let notificationCount2 = 0;
+    let startTime2 = Date.now();
+    let saveflag2=0;
     function handleNotifications2(event) {
       if (!connected )  //  !connected|| readValueInProgress2
         return;
-
-
+        
         myCharacteristic2 .readValue()
         .then(value => {
           value = value.buffer ? value : new DataView(value); //value  
@@ -281,30 +286,34 @@
           valueS2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           valueS3=value.getUint16(4) +value.getUint8(10)*65536;
           valueS4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
-
           
-
+          notificationCount2++;
+          let currentTime2 = Date.now();
+          if(notificationCount1>=20)
+            saveflag2=1;
+          if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
+            log(`L:${notificationCount2}`);
+            notificationCount2 = 0;
+            startTime2 = currentTime2;
+          }
         })
 
         if(flagL)
         {
-        chart.data.labels.push('');
-        chart.data.datasets[0].data.push(valueS1);
-        chart.data.datasets[1].data.push(valueS2);
-        chart.data.datasets[2].data.push(valueS3);
-        chart.data.datasets[3].data.push(valueS4);
-
-          dataL1[sL]=valueS1;
-          dataL2[sL]=valueS2;
-          dataL3[sL]=valueS3;
-          dataL4[sL]=valueS4;
+          chart.data.labels.push('');
+          chart.data.datasets[0].data.push(valueS1);
+          chart.data.datasets[1].data.push(valueS2);
+          chart.data.datasets[2].data.push(valueS3);
+          chart.data.datasets[3].data.push(valueS4);
+          if(saveflag1>0 && saveflag2>0){
+            dataL1[sL]=valueS1;
+            dataL2[sL]=valueS2;
+            dataL3[sL]=valueS3;
+            dataL4[sL]=valueS4;
+          }
           sL++;
           sL = sL & range;
-          if(full==0 & sL==8191)
-          {
-            full=1;
-            log('滿');
-          }
+
             if (chart.data.labels.length > maxLength) {
                 chart.data.labels.shift();
                 for (var i = 0; i < chart.data.datasets.length; i++) {
