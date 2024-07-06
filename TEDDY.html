@@ -232,7 +232,6 @@
           
           notificationCount1++;
           let currentTime1 = Date.now();
-          let saveflag1=0;
           if(notificationCount1>=20)
             saveflag1=1;
           if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
@@ -275,7 +274,7 @@
     //let readValueInProgress2 = false;
     let notificationCount2 = 0;
     let startTime2 = Date.now();
-    
+    let saveflag2=0;
     function handleNotifications2(event) {
       if (!connected )  //  !connected|| readValueInProgress2
         return;
@@ -290,7 +289,6 @@
           
           notificationCount2++;
           let currentTime2 = Date.now();
-          let saveflag2=0;
           if(notificationCount1>=20)
             saveflag2=1;
           if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
