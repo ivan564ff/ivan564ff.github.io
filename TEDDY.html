@@ -31,8 +31,8 @@
     var _char_uuid = '0000FFF1-0000-1000-8000-00805F9B34FB'.toLowerCase();
    
     var a=0,i=0,flag=0,s=0,flagL=0,sL=0,flagsave=0,flagsaveL=0,full=0;
-    const chartUpdateInterval = setInterval(updateChartEverySecond, 500);
-    const timeArrayInterval = setInterval(updateTimeArray, 1200000);
+    const chartUpdateInterval = setInterval(updateChartEverySecond, 1000);
+    //const timeArrayInterval = setInterval(updateTimeArray, 1200000);
     var bluetoothDevice = null;
     var connected = false;
     var StatusValue;
@@ -40,7 +40,7 @@
     var notified = false;
     var myCharacteristic;
     var change_flag=0,downloadCount=0;
-    var maxLength =256;
+    var maxLength =200;
     const dataL1 = [];
     const dataL2 = [];
     const dataL3 = [];
@@ -217,7 +217,7 @@
         $("#toggle").hide();
       }
     }
-    let readValueInProgress1 = false;
+    //let readValueInProgress1 = false;
     let notificationCount1 = 0;
     let startTime1 = Date.now();
     
@@ -271,7 +271,7 @@
 
     }
 
-    let readValueInProgress2 = false;
+    //let readValueInProgress2 = false;
     let notificationCount2 = 0;
     let startTime2 = Date.now();
     
@@ -322,7 +322,7 @@
 
     }
 
-    function updateChartEverySecond() {
+function updateChartEverySecond() {
     // 在这里调用 chart.update()
     if(flag & flagL)
     {
@@ -381,7 +381,7 @@ downloadLink.click();
     <div class="page-header">
       </div>
       <div class="col-sm-6">
-      <canvas id="chart" width="720" height="480"></canvas>
+      <canvas id="chart" width="500" height="300"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx = document.getElementById('chart').getContext('2d');
@@ -439,7 +439,7 @@ downloadLink.click();
     </script>
     </div>
     <div class="col-sm-6">
-    <canvas id="chart2" width="720" height="480"></canvas>
+    <canvas id="chart2" width="500" height="300"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx2 = document.getElementById('chart2').getContext('2d');
