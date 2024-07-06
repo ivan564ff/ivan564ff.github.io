@@ -1,3 +1,4 @@
+
 <html lang="zh-tw">
 
 
@@ -14,7 +15,6 @@
   <script src="https://cdn.anychart.com/releases/8.11.0/js/anychart-base.min.js"></script>
 </script>
 
-  
 
   <style type="text/css">      
     html, body, #container { 
@@ -32,14 +32,15 @@
    
     var a=0,i=0,flag=0,s=0,flagL=0,sL=0,flagsave=0,flagsaveL=0,full=0;
     const chartUpdateInterval = setInterval(updateChartEverySecond, 1000);
+    //const timeArrayInterval = setInterval(updateTimeArray, 1200000);
     var bluetoothDevice = null;
     var connected = false;
     var StatusValue;
-    var range=0X1FFF;
+    var range=0X1F40;
     var notified = false;
     var myCharacteristic;
     var change_flag=0,downloadCount=0;
-    var maxLength =256;
+    var maxLength =200;
     const dataL1 = [];
     const dataL2 = [];
     const dataL3 = [];
@@ -216,16 +217,14 @@
         $("#toggle").hide();
       }
     }
-
-    let readValueInProgress1 = false;
-
+    //let readValueInProgress1 = false;
     let notificationCount1 = 0;
     let startTime1 = Date.now();
-
+    
     function handleNotifications(event) {
-      if (!connected || readValueInProgress1) {
+        if (!connected )
         return;
-      }
+
         myCharacteristic .readValue()
         .then(value => {
           value = value.buffer ? value : new DataView(value); //value  
@@ -233,15 +232,15 @@
           realvalue2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           realvalue3=value.getUint16(4) +value.getUint8(10)*65536;
           realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
-
+          
           notificationCount1++;
           let currentTime1 = Date.now();
           if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
             log(`R:${notificationCount1}`);
             notificationCount1 = 0;
             startTime1 = currentTime1;
-        }
-        });
+          }
+        })
         
         //畫圖
         if(flag)
@@ -258,9 +257,6 @@
           dataR4[s]=realvalue4;
           s++;
           s = s & range;
-          
-          /*if(realvalue<=4000000 || realvalue2<=4000000 || realvalue3<=4000000 || realvalue4<=4000000)
-            log('Strain Gauge is broken!');*/
 
           if (chart2.data.labels.length > maxLength) {
                 chart2.data.labels.shift();
@@ -274,15 +270,15 @@
       
 
     }
-    let readValueInProgress2 = false;
 
+    //let readValueInProgress2 = false;
     let notificationCount2 = 0;
     let startTime2 = Date.now();
-
+    
     function handleNotifications2(event) {
-      if (!connected || readValueInProgress2) {
+      if (!connected )  //  !connected|| readValueInProgress2
         return;
-      }
+        
         myCharacteristic2 .readValue()
         .then(value => {
           value = value.buffer ? value : new DataView(value); //value  
@@ -290,6 +286,7 @@
           valueS2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           valueS3=value.getUint16(4) +value.getUint8(10)*65536;
           valueS4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
+          
           notificationCount2++;
           let currentTime2 = Date.now();
           if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
@@ -297,7 +294,7 @@
             notificationCount2 = 0;
             startTime2 = currentTime2;
           }
-        });
+        })
 
         if(flagL)
         {
@@ -313,11 +310,7 @@
           dataL4[sL]=valueS4;
           sL++;
           sL = sL & range;
-          if(full==0 & sL==8191)
-          {
-            full=1;
-            log('滿');
-          }
+
             if (chart.data.labels.length > maxLength) {
                 chart.data.labels.shift();
                 for (var i = 0; i < chart.data.datasets.length; i++) {
@@ -337,42 +330,43 @@ function updateChartEverySecond() {
     chart2.update();
     }
 }
+function updateTimeArray() {
+
+    if(flag & flagL)
+    {
+        loadData();
+    }
+
+}
 
 function loadData() {
-    downloadCount++;
+      downloadCount++;
    const data = {
-        array1: dataL1.filter(item => item !== null),
-        array2: dataL2.filter(item => item !== null),
-        array3: dataL3.filter(item => item !== null),
-        array4: dataL4.filter(item => item !== null),
-        array5: dataR1.filter(item => item !== null),
-        array6: dataR2.filter(item => item !== null),
-        array7: dataR3.filter(item => item !== null),
-        array8: dataR4.filter(item => item !== null),
-  };
+            array1: dataL1,
+            array2: dataL2,
+            array3: dataL3,
+            array4: dataL4,
+            array5: dataR1,
+            array6: dataR2,
+            array7: dataR3,
+            array8: dataR4,
+        };
 
-  var jsonData = JSON.stringify(data);
+        var jsonData = JSON.stringify(data);
 
-  // 创建一个Blob对象
-  var blob = new Blob([jsonData], { type: 'application/json' });
+// 创建一个Blob对象
+var blob = new Blob([jsonData], { type: 'application/json' });
 
-  // 创建一个下载链接
-  var downloadLink = document.createElement('a');
-  downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
+// 创建一个下载链接
+var downloadLink = document.createElement('a');
+downloadLink.href = URL.createObjectURL(blob);
+downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
 
-  // 模拟点击下载链接
-  downloadLink.click();
-  
-  dataL1.length = 0;
-  dataL2.length = 0;
-  dataL3.length = 0;    
-  dataL4.length = 0;
-  
-  dataR1.length = 0;
-  dataR2.length = 0;
-  dataR3.length = 0;    
-  dataR4.length = 0;
+// 模拟点击下载链接
+downloadLink.click();
+
+
+
 }
 
     
@@ -387,7 +381,7 @@ function loadData() {
     <div class="page-header">
       </div>
       <div class="col-sm-6">
-      <canvas id="chart" width="720" height="480"></canvas>
+      <canvas id="chart" width="500" height="300"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx = document.getElementById('chart').getContext('2d');
@@ -435,8 +429,8 @@ function loadData() {
                     },
                     y: {
                         //beginAtZero: true,
-                        suggestedMin: 7000000, // 设置Y轴的最小值
-                        suggestedMax: 11000000 // 设置Y轴的最大值*/
+                        suggestedMin: 4000000, // 设置Y轴的最小值
+                        suggestedMax: 7000000 // 设置Y轴的最大值*/
                     }
                 
                 }
@@ -445,7 +439,7 @@ function loadData() {
     </script>
     </div>
     <div class="col-sm-6">
-    <canvas id="chart2" width="720" height="480"></canvas>
+    <canvas id="chart2" width="500" height="300"></canvas>
       <script>
         // 创建一个Chart实例
         var ctx2 = document.getElementById('chart2').getContext('2d');
@@ -493,8 +487,8 @@ function loadData() {
                     },
                     y: {
                         //beginAtZero: true,
-                        suggestedMin: 7000000, // 设置Y轴的最小值
-                        suggestedMax: 11000000 // 设置Y轴的最大值*/
+                        suggestedMin: 4000000, // 设置Y轴的最小值
+                        suggestedMax: 7000000 // 设置Y轴的最大值*/
                     }
                 
                 }
