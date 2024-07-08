@@ -1,4 +1,6 @@
+
 <html lang="zh-tw">
+
 
 <head>
   <title>AB</title>
@@ -30,6 +32,7 @@
    
     var a=0,i=0,flag=0,s=0,flagL=0,sL=0,flagsave=0,flagsaveL=0,full=0;
     const chartUpdateInterval = setInterval(updateChartEverySecond, 500);
+    const timeArrayInterval = setInterval(updateTimeArray, 60000);
     var bluetoothDevice = null;
     var connected = false;
     var StatusValue;
@@ -37,7 +40,7 @@
     var notified = false;
     var myCharacteristic;
     var change_flag=0,downloadCount=0;
-    var maxLength =256;
+    var maxLength =200;
     const dataL1 = [];
     const dataL2 = [];
     const dataL3 = [];
@@ -189,7 +192,6 @@
         // document.querySelector('#toggle').classList.add("disabled");
         return;
       }
-
       if (connected ) {
         document.querySelector('#connect').onclick = _disconnect;
         document.querySelector('#connect').innerText = "Disconnect";
@@ -214,10 +216,7 @@
         $("#toggle").hide();
       }
     }
-    //let readValueInProgress1 = false;
-    let notificationCount1 = 0;
-    let startTime1 = Date.now();
-    let saveflag1=0;
+
     function handleNotifications(event) {
         if (!connected )
         return;
@@ -229,16 +228,6 @@
           realvalue2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           realvalue3=value.getUint16(4) +value.getUint8(10)*65536;
           realvalue4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
-          
-          notificationCount1++;
-          let currentTime1 = Date.now();
-          if(notificationCount1>=20)
-            saveflag1=1;
-          if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
-            log(`R:${notificationCount1}`);
-            notificationCount1 = 0;
-            startTime1 = currentTime1;
-          }
         })
         
         //畫圖
@@ -249,12 +238,15 @@
           chart2.data.datasets[1].data.push(realvalue2);
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
-          if(saveflag1>0 && saveflag2>0){
+          
+          
+          setTimeout(() => {
             dataR1[s]=realvalue;
             dataR2[s]=realvalue2;
             dataR3[s]=realvalue3;
             dataR4[s]=realvalue4;
-          }
+          }, 8000);  
+          
           s++;
           s = s & range;
 
@@ -270,15 +262,11 @@
       
 
     }
-
-    //let readValueInProgress2 = false;
-    let notificationCount2 = 0;
-    let startTime2 = Date.now();
-    let saveflag2=0;
     function handleNotifications2(event) {
       if (!connected )  //  !connected|| readValueInProgress2
         return;
-        
+
+
         myCharacteristic2 .readValue()
         .then(value => {
           value = value.buffer ? value : new DataView(value); //value  
@@ -286,34 +274,33 @@
           valueS2=value.getUint8(4)+value.getUint8(5)*256 +value.getUint8(6)*65536;
           valueS3=value.getUint16(4) +value.getUint8(10)*65536;
           valueS4= value.getUint8(12)+value.getUint8(13)*256 +value.getUint8(14)*65536;
-          
-          notificationCount2++;
-          let currentTime2 = Date.now();
-          if(notificationCount1>=20)
-            saveflag2=1;
-          if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
-            log(`L:${notificationCount2}`);
-            notificationCount2 = 0;
-            startTime2 = currentTime2;
-          }
+
+
         })
 
         if(flagL)
         {
-          chart.data.labels.push('');
-          chart.data.datasets[0].data.push(valueS1);
-          chart.data.datasets[1].data.push(valueS2);
-          chart.data.datasets[2].data.push(valueS3);
-          chart.data.datasets[3].data.push(valueS4);
-          if(saveflag1>0 && saveflag2>0){
+        chart.data.labels.push('');
+        chart.data.datasets[0].data.push(valueS1);
+        chart.data.datasets[1].data.push(valueS2);
+        chart.data.datasets[2].data.push(valueS3);
+        chart.data.datasets[3].data.push(valueS4);
+        
+        
+        setTimeout(() => {
             dataL1[sL]=valueS1;
             dataL2[sL]=valueS2;
             dataL3[sL]=valueS3;
             dataL4[sL]=valueS4;
-          }
+          }, 8000);  
+          
           sL++;
           sL = sL & range;
-
+          if(full==0 & sL==8191)
+          {
+            full=1;
+            log('滿');
+          }
             if (chart.data.labels.length > maxLength) {
                 chart.data.labels.shift();
                 for (var i = 0; i < chart.data.datasets.length; i++) {
@@ -333,10 +320,41 @@
     chart2.update();
     }
 }
+function updateTimeArray() {
+    if(flag & flagL){
+        loadData();
+    }
+}
+/*function loadData() {
+      downloadCount++;
+   const data = {
+            array1: dataL1,
+            array2: dataL2,
+            array3: dataL3,
+            array4: dataL4,
+            array5: dataR1,
+            array6: dataR2,
+            array7: dataR3,
+            array8: dataR4,
+        };
 
+        var jsonData = JSON.stringify(data);
+
+// 创建一个Blob对象
+var blob = new Blob([jsonData], { type: 'application/json' });
+
+// 创建一个下载链接
+var downloadLink = document.createElement('a');
+downloadLink.href = URL.createObjectURL(blob);
+downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
+
+// 模拟点击下载链接
+downloadLink.click();
+
+}*/
 function loadData() {
     downloadCount++;
-   const data = {
+     const data = {
         array1: dataL1.filter(item => item !== null),
         array2: dataL2.filter(item => item !== null),
         array3: dataL3.filter(item => item !== null),
@@ -345,32 +363,31 @@ function loadData() {
         array6: dataR2.filter(item => item !== null),
         array7: dataR3.filter(item => item !== null),
         array8: dataR4.filter(item => item !== null),
-  };
+    };
 
-  var jsonData = JSON.stringify(data);
-
-  // 创建一个Blob对象
-  var blob = new Blob([jsonData], { type: 'application/json' });
-
-  // 创建一个下载链接
-  var downloadLink = document.createElement('a');
-  downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
-
-  // 模拟点击下载链接
-  downloadLink.click();
+    var jsonData = JSON.stringify(data);
   
-  dataL1.length = 0;
-  dataL2.length = 0;
-  dataL3.length = 0;    
-  dataL4.length = 0;
+    // 创建一个Blob对象
+    var blob = new Blob([jsonData], { type: 'application/json' });
   
-  dataR1.length = 0;
-  dataR2.length = 0;
-  dataR3.length = 0;    
-  dataR4.length = 0;
+    // 创建一个下载链接
+    var downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
+  
+    // 模拟点击下载链接
+    downloadLink.click();
+    
+    dataL1.length = 0;
+    dataL2.length = 0;
+    dataL3.length = 0;    
+    dataL4.length = 0;
+    
+    dataR1.length = 0;
+    dataR2.length = 0;
+    dataR3.length = 0;    
+    dataR4.length = 0;
 }
-
     
 
   </script>
