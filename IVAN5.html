@@ -218,6 +218,7 @@
       }
     }
 
+    
     function handleNotifications(event) {
         if (!connected )
         return;
@@ -240,10 +241,13 @@
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
           
-          dataR1[s]=realvalue;
-          dataR2[s]=realvalue2;
-          dataR3[s]=realvalue3;
-          dataR4[s]=realvalue4;
+          
+          setTimeout(() => {
+            dataR1[s]=realvalue;
+            dataR2[s]=realvalue2;
+            dataR3[s]=realvalue3;
+            dataR4[s]=realvalue4;
+          }, 8000);  
           
           s++;
           s = s & range;
@@ -284,11 +288,14 @@
         chart.data.datasets[2].data.push(valueS3);
         chart.data.datasets[3].data.push(valueS4);
         
-        dataL1[sL]=valueS1;
-        dataL2[sL]=valueS2;
-        dataL3[sL]=valueS3;
-        dataL4[sL]=valueS4;
         
+        setTimeout(() => {
+            dataL1[sL]=valueS1;
+            dataL2[sL]=valueS2;
+            dataL3[sL]=valueS3;
+            dataL4[sL]=valueS4;
+          }, 8000);  
+          
           sL++;
           sL = sL & range;
           if(full==0 & sL==8191)
