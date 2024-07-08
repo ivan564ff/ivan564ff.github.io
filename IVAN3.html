@@ -216,7 +216,7 @@
     //let readValueInProgress1 = false;
     let notificationCount1 = 0;
     let startTime1 = Date.now();
-    let saveflag1=0;
+
     function handleNotifications(event) {
         if (!connected )
         return;
@@ -232,7 +232,7 @@
           notificationCount1++;
           let currentTime1 = Date.now();
           if(notificationCount1>=20)
-            saveflag1=1;
+            const saveflag1=1;
           if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
             log(`R:${notificationCount1}`);
             notificationCount1 = 0;
@@ -248,12 +248,12 @@
           chart2.data.datasets[1].data.push(realvalue2);
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
-          //if(saveflag1>0 && saveflag2>0){
+          if(saveflag1>0 && saveflag2>0){
             dataR1[s]=realvalue;
             dataR2[s]=realvalue2;
             dataR3[s]=realvalue3;
             dataR4[s]=realvalue4;
-          //}
+          }
           s++;
           s = s & range;
 
@@ -273,7 +273,7 @@
     //let readValueInProgress2 = false;
     let notificationCount2 = 0;
     let startTime2 = Date.now();
-    let saveflag2=0;
+    
     function handleNotifications2(event) {
       if (!connected )  //  !connected|| readValueInProgress2
         return;
@@ -289,7 +289,7 @@
           notificationCount2++;
           let currentTime2 = Date.now();
           if(notificationCount1>=20)
-            saveflag2=1;
+            const saveflag2=1;
           if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
             log(`L:${notificationCount2}`);
             notificationCount2 = 0;
