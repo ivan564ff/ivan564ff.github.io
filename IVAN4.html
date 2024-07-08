@@ -233,9 +233,9 @@
           
           notificationCount1++;
           let currentTime1 = Date.now();
-          if(notificationCount1>=20){
-            saveflag1=1;
-          }
+          if (notificationCount1 >= 20 && saveflag1 === 0) {
+            saveflag1 = 1;
+        }
           if (currentTime1 - startTime1 >= 1000) { // 每秒输出一次频率
             log(`R:${notificationCount1}`);
             notificationCount1 = 0;
@@ -295,9 +295,9 @@
           
           notificationCount2++;
           let currentTime2 = Date.now();
-          if(notificationCount2>=20){
-             saveflag2=1;
-          }
+          if (notificationCount2 >= 20 && saveflag2 === 0) {
+            saveflag2 = 1;
+        }
           if (currentTime2 - startTime2 >= 1000) { // 每秒输出一次频率
             log(`L:${notificationCount2}`);
             notificationCount2 = 0;
