@@ -253,12 +253,12 @@
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
           //if(saveflag1>0 && saveflag2>0){
-          if(Date.now() - startTime1 > 8000){ 
+          //if(Date.now() - startTime1 > 8000){ 
             dataR1[s]=realvalue;
             dataR2[s]=realvalue2;
             dataR3[s]=realvalue3;
             dataR4[s]=realvalue4;
-          }
+         // }
           s++;
           s = s & range;
 
@@ -314,12 +314,12 @@
           chart.data.datasets[2].data.push(valueS3);
           chart.data.datasets[3].data.push(valueS4);
           //if(saveflag1>0 && saveflag2>0){
-          if (Date.now() - startTime2 > 8000) {
+          //if (Date.now() - startTime2 > 8000) {
               dataL1[sL] = valueS1;
               dataL2[sL] = valueS2;
               dataL3[sL] = valueS3;
               dataL4[sL] = valueS4;
-          }
+          //}
 
           sL++;
           sL = sL & range;
