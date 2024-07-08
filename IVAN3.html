@@ -28,7 +28,7 @@
    
     var a=0,i=0,flag=0,s=0,flagL=0,sL=0,flagsave=0,flagsaveL=0,full=0;
     const chartUpdateInterval = setInterval(updateChartEverySecond, 1000);
-    //const timeArrayInterval = setInterval(updateTimeArray, 30000);
+    const timeArrayInterval = setInterval(updateTimeArray, 30000);
     var bluetoothDevice = null;
     var connected = false;
     var StatusValue;
@@ -249,7 +249,6 @@
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
           if(saveflag1>0 && saveflag2>0){
-            const timeArrayInterval = setInterval(updateTimeArray, 30000);
             dataR1[s]=realvalue;
             dataR2[s]=realvalue2;
             dataR3[s]=realvalue3;
