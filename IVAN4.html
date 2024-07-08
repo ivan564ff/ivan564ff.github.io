@@ -217,8 +217,9 @@
     let notificationCount1 = 0;
     let startTime1 = Date.now();
     let saveflag1 = 0;
-    /*if(notificationCount1>=20)
-            saveflag1=1;*/
+    if(notificationCount1>=20)
+        saveflag1=1;
+    
     function handleNotifications(event) {
         if (!connected )
         return;
@@ -251,8 +252,8 @@
           chart2.data.datasets[1].data.push(realvalue2);
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
-          //if(saveflag1>0 && saveflag2>0){
-          if(startTime1>8000){ 
+          if(saveflag1>0 && saveflag2>0){
+          //if(startTime1>8000){ 
             dataR1[s]=realvalue;
             dataR2[s]=realvalue2;
             dataR3[s]=realvalue3;
@@ -278,8 +279,8 @@
     let notificationCount2 = 0;
     let startTime2 = Date.now();
     let saveflag2 = 0;
-    /*if(notificationCount2>=20)
-            const saveflag2=1;*/
+    if(notificationCount2>=20)
+       saveflag2=1;
     
     function handleNotifications2(event) {
       if (!connected )  //  !connected|| readValueInProgress2
@@ -312,8 +313,8 @@
           chart.data.datasets[1].data.push(valueS2);
           chart.data.datasets[2].data.push(valueS3);
           chart.data.datasets[3].data.push(valueS4);
-          //if(saveflag1>0 && saveflag2>0){
-          if(startTime2>8000){ 
+          if(saveflag1>0 && saveflag2>0){
+          //if(startTime2>8000){ 
             dataL1[sL]=valueS1;
             dataL2[sL]=valueS2;
             dataL3[sL]=valueS3;
