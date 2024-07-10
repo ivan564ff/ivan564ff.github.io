@@ -30,7 +30,7 @@
     var _char_uuid = '0000FFF1-0000-1000-8000-00805F9B34FB'.toLowerCase();
    
     var a=0,i=0,flag=0,s=0,flagL=0,sL=0,flagsave=0,flagsaveL=0,full=0;
-    const chartUpdateInterval = setInterval(updateChartEverySecond, 300);
+    const chartUpdateInterval = setInterval(updateChartEverySecond, 500);
     const timeArrayInterval = setInterval(updateTimeArray, 60000);
     var bluetoothDevice = null;
     var connected = false;
@@ -63,7 +63,7 @@
     function _connect() {
       document.querySelector('#log').textContent = '';
       //log('Requesting any Bluetooth Device...');
-      navigator.bluetooth.requestDevice({ filters: [{ name: 'iebBluetooth' }],
+      navigator.bluetooth.requestDevice({ filters: [{ name: 'gebBluetooth' }],
       optionalServices: [_serv_uuid]
     
     })
@@ -87,7 +87,7 @@
       .then(characteristic1 => {
         //log('Got characteristic of Device1');
         myCharacteristic = characteristic1;
-        return navigator.bluetooth.requestDevice({ filters: [{ name: 'jebBluetooth' }],
+        return navigator.bluetooth.requestDevice({ filters: [{ name: 'hebBluetooth' }],
         optionalServices: [_serv_uuid]  
      });
       })
@@ -191,7 +191,6 @@
         // document.querySelector('#toggle').classList.add("disabled");
         return;
       }
-
       if (connected ) {
         document.querySelector('#connect').onclick = _disconnect;
         document.querySelector('#connect').innerText = "Disconnect";
@@ -217,7 +216,6 @@
       }
     }
 
-    
     function handleNotifications(event) {
         if (!connected )
         return;
