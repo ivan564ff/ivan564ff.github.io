@@ -24,6 +24,9 @@
 
   <script>
     var loadedModel;
+
+    const classN=['walk','lie','sit','bow','llying','rlying','flying','blying'];
+
     var _serv_uuid = '0000FFF0-0000-1000-8000-00805F9B34FB'.toLowerCase();
     var _char_uuid = '0000FFF1-0000-1000-8000-00805F9B34FB'.toLowerCase();
    
@@ -189,7 +192,6 @@
         // document.querySelector('#toggle').classList.add("disabled");
         return;
       }
-
       if (connected ) {
         document.querySelector('#connect').onclick = _disconnect;
         document.querySelector('#connect').innerText = "Disconnect";
@@ -215,7 +217,6 @@
       }
     }
 
-    
     function handleNotifications(event) {
         if (!connected )
         return;
@@ -324,6 +325,33 @@ function updateTimeArray() {
         loadData();
     }
 }
+/*function loadData() {
+      downloadCount++;
+   const data = {
+            array1: dataL1,
+            array2: dataL2,
+            array3: dataL3,
+            array4: dataL4,
+            array5: dataR1,
+            array6: dataR2,
+            array7: dataR3,
+            array8: dataR4,
+        };
+
+        var jsonData = JSON.stringify(data);
+
+// 创建一个Blob对象
+var blob = new Blob([jsonData], { type: 'application/json' });
+
+// 创建一个下载链接
+var downloadLink = document.createElement('a');
+downloadLink.href = URL.createObjectURL(blob);
+downloadLink.download = 'data' + downloadCount + '.json';// 下载的文件名
+
+// 模拟点击下载链接
+downloadLink.click();
+
+}*/
 function loadData() {
     downloadCount++;
      const data = {
