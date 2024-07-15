@@ -35,7 +35,7 @@
     var notified = false;
     var myCharacteristic;
     var change_flag=0,downloadCount=0;
-    var maxLength =50;
+    var maxLength =200;
     const dataL1 = [];
     const dataL2 = [];
     const dataL3 = [];
@@ -220,7 +220,7 @@
     let notificationCount1 = 0;
     let startTime1 = Date.now();
     function handleNotifications(event) {
-      if (!connected || readValueInProgress1) {
+      if (!connected) {
         return;
       }
         myCharacteristic .readValue()
@@ -255,12 +255,12 @@
           chart2.data.datasets[1].data.push(realvalue2);
           chart2.data.datasets[2].data.push(realvalue3);
           chart2.data.datasets[3].data.push(realvalue4);
-          if(startTime1>8000){
+          setTimeout(() => {
             dataR1[s]=realvalue;
             dataR2[s]=realvalue2;
             dataR3[s]=realvalue3;
             dataR4[s]=realvalue4;
-          }
+          }, 8000);
           s++;
           s = s & range;
           
@@ -283,7 +283,7 @@
     let notificationCount2 = 0;
    let startTime2 = Date.now();
     function handleNotifications2(event) {
-      if (!connected || readValueInProgress2) {
+      if (!connected) {
         return;
       }
         myCharacteristic2 .readValue()
@@ -315,12 +315,12 @@
           chart.data.datasets[1].data.push(valueS2);
           chart.data.datasets[2].data.push(valueS3);
           chart.data.datasets[3].data.push(valueS4);
-          /*if(startTime2>8000){*/
+          setTimeout(() => {
             dataL1[sL]=valueS1;
             dataL2[sL]=valueS2;
             dataL3[sL]=valueS3;
             dataL4[sL]=valueS4;
-          //}
+          }, 8000);
           sL++;
           sL = sL & range;
           if(full==0 & sL==8191)
